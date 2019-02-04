@@ -47,13 +47,17 @@ module KelvinletsVideo
                     dy = min(dy1, dy2)
                     dz = min(dz1, dz2)
 
-                    y = 2(object.sizeY/2 - dy)/object.sizeY
-                    x = 2(object.sizeX/2 - dx)/object.sizeX
-                    z = 2(object.sizeZ/2 - dz)/object.sizeZ
+                    y = 2(object.sizeY/2 - (dy - 1))/object.sizeY
+                    x = 2(object.sizeX/2 - (dx - 1))/object.sizeX
+                    z = 2(object.sizeZ/2 - (dz - 1))/object.sizeZ
 
                     Δ[1] *= retardationFunction(y)
                     Δ[2] *= retardationFunction(x)
                     Δ[3] *= retardationFunction(z)
+
+                     # if i == 1
+                     #   @show dy, y, retardationFunction(y)                  
+                     # end
 
                     Δ += [i, j, k]
                     
