@@ -1,29 +1,29 @@
 module TetrahedronInterpolator
     export rasterization
-    using Images
+    using Images, LinearAlgebra
     function planeEquation(a::Array{Float64, 1}, b::Array{Float64, 1}, c::Array{Float64, 1})::Array{Float64, 1}
-         @fastmath @inbounds ab::Array{Float64, 1} = [b[1] - a[1], b[2] - a[2], b[3] - a[3]]
-         @fastmath @inbounds ac::Array{Float64, 1} = [c[1] - a[1], c[2] - a[2], c[3] - a[3]]
-        normal::Array{Float64, 1} = cross(ab, ac)
-         @fastmath @inbounds d::Float64 = - (normal[1]*a[1] + normal[2]*a[2] + normal[3]*a[3])
-         [normal[1], normal[2], normal[3], d]
+        ab = [b[1] - a[1], b[2] - a[2], b[3] - a[3]]
+        ac = [c[1] - a[1], c[2] - a[2], c[3] - a[3]]
+        normal = cross(ab, ac)
+        d = - (normal[1]*a[1] + normal[2]*a[2] + normal[3]*a[3])
+        [normal[1], normal[2], normal[3], d]
     end
 
     function getEquations(A::Array{Float64, 1}, B::Array{Float64, 1},
                           C::Array{Float64, 1}, D::Array{Float64, 1})::Array{Array{Float64, 1}, 1}
-        eq1::Array{Float64, 1} = planeEquation(A, B, C)
+        eq1 = planeEquation(A, B, C)
         if (eq1[1:3]' * D + eq1[4])[1] < 0
             eq1 = planeEquation(A, C, B)
         end
-        eq2::Array{Float64, 1} = planeEquation(A, B, D)
+        eq2 = planeEquation(A, B, D)
         if (eq2[1:3]' * C + eq2[4])[1] < 0
             eq2 = planeEquation(A, D, B)
         end
-        eq3::Array{Float64, 1} = planeEquation(A, C, D)
+        eq3 = planeEquation(A, C, D)
         if (eq3[1:3]' * B + eq3[4])[1] < 0
             eq3 = planeEquation(A, D, C)
         end
-        eq4::Array{Float64, 1} = planeEquation(B, C, D)
+        eq4 = planeEquation(B, C, D)
         if (eq4[1:3]' * A + eq4[4])[1] < 0
             eq4 = planeEquation(B, D, C)
         end
@@ -41,16 +41,16 @@ module TetrahedronInterpolator
 
     function pointToPlane(point::Array{Float64, 1}, a::Array{Float64, 1},
                           b::Array{Float64, 1}, c::Array{Float64, 1})::Float64
-        abc::Array{Float64, 1} = planeEquation(a, b, c)
+        abc = planeEquation(a, b, c)
 
-        b::Float64 = abc[1]
-        a::Float64 = abc[2]
-        c::Float64 = abc[3]
-        d::Float64 = abc[4]
+        b = abc[1]
+        a = abc[2]
+        c = abc[3]
+        d = abc[4]
 
-         α::Float64 = - (a*point[2] + b*point[1] + c*point[3] + d)/(a^2 + b^2 + c^2)
+        α = - (a*point[2] + b*point[1] + c*point[3] + d)/(a^2 + b^2 + c^2)
 
-        pointOnPlane::Array{Float64, 1} = α*abc[1:3] + point
+        pointOnPlane = α*abc[1:3] + point
 
         norm(point - pointOnPlane)
     end
@@ -60,10 +60,10 @@ module TetrahedronInterpolator
                                C::Array{Float64, 1}, D::Array{Float64, 1},
                                colorA::RGB{N0f8}, colorB::RGB{N0f8},
                                colorC::RGB{N0f8}, colorD::RGB{N0f8})::RGB{N0f8}
-        influenceA::Float64 = pointToPlane(Array{Float64}(P), B, C, D) / pointToPlane(A, B, C, D)
-        influenceB::Float64 = pointToPlane(Array{Float64}(P), A, C, D) / pointToPlane(B, A, C, D)
-        influenceC::Float64 = pointToPlane(Array{Float64}(P), A, B, D) / pointToPlane(C, A, B, D)
-        influenceD::Float64 = pointToPlane(Array{Float64}(P), A, B, C) / pointToPlane(D, A, B, C)
+        influenceA = pointToPlane(Array{Float64}(P), B, C, D) / pointToPlane(A, B, C, D)
+        influenceB = pointToPlane(Array{Float64}(P), A, C, D) / pointToPlane(B, A, C, D)
+        influenceC = pointToPlane(Array{Float64}(P), A, B, D) / pointToPlane(C, A, B, D)
+        influenceD = pointToPlane(Array{Float64}(P), A, B, C) / pointToPlane(D, A, B, C)
 
         influenceA * colorA +
         influenceB * colorB +
@@ -73,8 +73,8 @@ module TetrahedronInterpolator
 
     function setBBOX(A::Array{Float64, 1}, B::Array{Float64, 1}, C::Array{Float64, 1}, D::Array{Float64, 1},
                     Δx::Int64, Δy::Int64, Δz::Int64)::Array{Real, 1}
-        maxY::Real = max(A[1], B[1], C[1], D[1])
-        minY::Real = min(A[1], B[1], C[1], D[1])
+        maxY = max(A[1], B[1], C[1], D[1])
+        minY = min(A[1], B[1], C[1], D[1])
 
         if maxY > Δy
             maxY = Δy
@@ -83,8 +83,8 @@ module TetrahedronInterpolator
             minY = 1
         end
 
-        maxX::Real = max(A[2], B[2], C[2], D[2])
-        minX::Real = min(A[2], B[2], C[2], D[2])
+        maxX = max(A[2], B[2], C[2], D[2])
+        minX = min(A[2], B[2], C[2], D[2])
         if maxX > Δx
             maxX = Δx
         end
@@ -92,8 +92,8 @@ module TetrahedronInterpolator
             minX = 1
         end
 
-        maxZ::Real = max(A[3], B[3], C[3], D[3])
-        minZ::Real = min(A[3], B[3], C[3], D[3])
+        maxZ = max(A[3], B[3], C[3], D[3])
+        minZ = min(A[3], B[3], C[3], D[3])
         if maxZ > Δz
             maxZ = Δz
         end
@@ -118,8 +118,8 @@ module TetrahedronInterpolator
                            C::Array{Float64, 1}, D::Array{Float64, 1},
                            colorA::RGB{N0f8}, colorB::RGB{N0f8},
                            colorC::RGB{N0f8}, colorD::RGB{N0f8})::Array{RGB{N0f8}, 3}
-        maxY::Float64, minY::Float64, maxX::Float64, minX::Float64, maxZ::Float64, minZ::Float64 = setBBOX(A, B, C, D,
-                                                                    size(video)[2], size(video)[1], size(video)[3])
+        maxY, minY, maxX, minX, maxZ, minZ = setBBOX(A, B, C, D,
+                                                     size(video)[2], size(video)[1], size(video)[3])
         eq1, eq2, eq3, eq4 = getEquations(A, B, C, D)
         for i=floor(Int64, minY):ceil(Int64, maxY)
             for j=floor(Int64, minX):ceil(Int64, maxX)

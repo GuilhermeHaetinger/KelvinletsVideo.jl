@@ -1,7 +1,7 @@
 module KelvinletsVideo
     include("tetrahedronInterpolator.jl")
-    using Images, ProgressMeter, ImageView
-    export KelvinletsVideoObject, grab, scale, pinch
+    using Images, ProgressMeter, ImageView, LinearAlgebra
+    export KelvinletsVideoObject, grab
 
     struct KelvinletsVideoObject
         a::Float64
