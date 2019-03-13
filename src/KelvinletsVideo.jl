@@ -31,33 +31,30 @@ module KelvinletsVideo
                                 retardationFunction)::Array{RGB{N0f8}, 3}
 
         allΔ = zeros(object.sizeY, object.sizeX, object.sizeZ, 3)
-        for i=1:object.sizeY
+        print("Applying Variation")
+        @showprogress for i=1:object.sizeY
             for j=1:object.sizeX
                 for k=1:object.sizeZ
                     Δ = variationCalculator([i, j, k])
 
-                    dx1 = j
+                    dx1 = j - 1
                     dx2 = object.sizeX - j
-                    dy1 = i
+                    dy1 = i - 1
                     dy2 = object.sizeY - i
-                    dz1 = k
+                    dz1 = k - 1
                     dz2 = object.sizeZ - k
 
                     dx = min(dx1, dx2)
                     dy = min(dy1, dy2)
                     dz = min(dz1, dz2)
 
-                    y = 2(object.sizeY/2 - (dy - 1))/object.sizeY
-                    x = 2(object.sizeX/2 - (dx - 1))/object.sizeX
-                    z = 2(object.sizeZ/2 - (dz - 1))/object.sizeZ
+                    y = 2(object.sizeY/2 - (dy))/object.sizeY
+                    x = 2(object.sizeX/2 - (dx))/object.sizeX
+                    z = 2(object.sizeZ/2 - (dz))/object.sizeZ
 
                     Δ[1] *= retardationFunction(y)
                     Δ[2] *= retardationFunction(x)
                     Δ[3] *= retardationFunction(z)
-
-                     # if i == 1
-                     #   @show dy, y, retardationFunction(y)                  
-                     # end
 
                     Δ += [i, j, k]
                     
@@ -86,6 +83,7 @@ module KelvinletsVideo
                             colorA, colorB, colorC, colorD
             )
         end
+        print("Applying Interpolation")
         @showprogress for i=1:object.sizeY-1
             for j=1:object.sizeX-1
                 for k=1:object.sizeZ-1
