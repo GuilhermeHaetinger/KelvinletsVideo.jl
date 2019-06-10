@@ -1,7 +1,7 @@
 ---
-Author:Guilherme Gomes Haetinger
-Title:KelvinletsVideo.jl
-Date:Nov. 20th, 2018
+Author: Guilherme Gomes Haetinger
+Title: KelvinletsVideo.jl
+Date: Nov. 20th, 2018
 ---
 
 # KelvinletsVideo.jl
